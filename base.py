@@ -1,5 +1,7 @@
 import os
 
+from pathlib import Path
+
 from PyQt5.QtWidgets import (
     QMainWindow, 
     QLabel,
@@ -27,6 +29,24 @@ class DetectionProbabilityCounter(QMainWindow):
 
         self.L = None
         self.N = None
+
+    def load_results(self):
+        img_path = Path(self.image_files[self.current_image_index])
+        img_name = img_path.name
+
+        res_path = os.path.join("results", img_name) + ".txt"
+
+        if(Path(res_path).exists()):
+            with open(res_path, mode='r', encoding='utf-8') as f:
+                data = dict()
+                lines = f.readlines()
+
+                for line in lines:
+                    key, val = line.split(": ")
+                    data[key] = val.rstrip("\n")
+                self.input_panel.set_data(data)
+        else:
+            self.input_panel.clear()
     
     def loadCurrentImage(self):
         image_path = self.image_files[self.current_image_index]
@@ -41,6 +61,8 @@ class DetectionProbabilityCounter(QMainWindow):
             self.input_panel.exif_label.setText(str(resolution))
             self.L = max(resolution)
             self.N = resolution[0]
+
+            self.load_results()
     
     def resizeEvent(self, event):
         if hasattr(self, 'original_pixmap') and self.original_pixmap:

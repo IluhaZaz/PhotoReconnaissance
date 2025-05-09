@@ -27,6 +27,7 @@ class InputPanel(QWidget):
         super().__init__()
 
         self.main_window = main_window
+        self.data = {}
 
         layout = QVBoxLayout(self)
         
@@ -88,10 +89,10 @@ class InputPanel(QWidget):
         self.count_btn.clicked.connect(self.count_results)
         layout.addWidget(self.count_btn)
 
-        self.Pобн_label = QLabel("Коэффициент обнаружения")
+        self.Pобн_label = QLabel("Вероятность обнаружения")
         layout.addWidget(self.Pобн_label)
 
-        self.Pрасп_label = QLabel("Коэффициент распознавания")
+        self.Pрасп_label = QLabel("Вероятность распознавания")
         layout.addWidget(self.Pрасп_label)
 
         self.exif_label = QLabel()
@@ -104,6 +105,35 @@ class InputPanel(QWidget):
     def pickColor(self):
         dialog = QColorDialog()
         dialog.getColor(options=QColorDialog.ShowAlphaChannel)
+
+    def clear(self):
+        self.Rвпис.clear()
+        self.Rопис.clear()
+        self.S.clear()
+        self.G.clear()
+        self.Lо.clear()
+        self.Lф.clear()
+        self.lm.clear()
+        self.R.clear()
+        self.O.clear()
+        self.Kпр.clear()
+
+        self.Pобн_label.setText("Вероятность обнаружения")
+        self.Pрасп_label.setText("Вероятность распознавания")
+
+    def set_data(self, data: dict[str, str]):
+        self.Rвпис.setText(data['Rвпис'])
+        self.Rопис.setText(data['Rопис'])
+        self.S.setText(data['S'])
+        self.G.setText(data['G'])
+        self.Lо.setText(data['Lоб'])
+        self.Lф.setText(data['Lф'])
+        self.lm.setText(data['lm'])
+        self.R.setText(data['R'])
+        self.O.setText(data['O'])
+        self.Kпр.setText(data['kпр'])
+
+        self.count_results()
 
     def count_results(self):
         data = dict()
@@ -128,8 +158,8 @@ class InputPanel(QWidget):
         data['Pобн'] = Pобн
         data['Pрасп'] = Pрасп
 
-        self.Pобн_label.setText("Коэффициент обнаружения: " + str(round(Pобн, 4)))
-        self.Pрасп_label.setText("Коэффициент расспознавания: " + str(round(Pрасп, 4)))
+        self.Pобн_label.setText("Вероятность обнаружения: " + str(round(Pобн, 4)))
+        self.Pрасп_label.setText("Вероятность расспознавания: " + str(round(Pрасп, 4)))
 
         self.data = data
 

@@ -12,9 +12,11 @@ def count_P(Rвпис, Rопис, S, G, L, Lоб, Lф, lm, R, N, O, kпр):
 
     lпикс = 360*N*tan(lm/(2*R))/(kпр*pi*O)
 
-    Pобн = exp(-(B*L/(4*lпикс*sqrt(K)))**2)
-
-    Pрасп = exp(-(B*L/(lпикс*sqrt(K)))**2)
+    try:
+        Pобн = exp(-(B*L/(4*lпикс*sqrt(K)))**2)
+        Pрасп = exp(-(B*L/(lпикс*sqrt(K)))**2)
+    except ZeroDivisionError:
+        Pобн, Pрасп = -1, -1
 
     return Pобн, Pрасп
 
