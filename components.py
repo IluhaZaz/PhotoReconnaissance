@@ -1,5 +1,7 @@
 import os
 
+from pathlib import Path
+
 from PyQt5.QtWidgets import (
     QMainWindow,
     QFileDialog,
@@ -95,26 +97,49 @@ class InputPanel(QWidget):
         self.exif_label = QLabel()
         layout.addWidget(self.exif_label)
 
+        self.save_res_btn = QPushButton("Сохранить результаты")
+        self.save_res_btn.clicked.connect(self.save_result)
+        layout.addWidget(self.save_res_btn)
+
     def pickColor(self):
         dialog = QColorDialog()
         dialog.getColor(options=QColorDialog.ShowAlphaChannel)
 
     def count_results(self):
-        Rвпис = float(self.Rвпис.text())
-        Rопис = float(self.Rопис.text())
-        S = float(self.S.text())
-        G = float(self.G.text())
-        Lоб = int(self.Lо.text())
-        Lф = int(self.Lф.text())
-        lm = float(self.lm.text())
-        R = int(self.R.text())
-        O = int(self.O.text())
-        kпр = float(self.Kпр.text())
+        data = dict()
 
-        Pобн, Pрасп = count_P(Rвпис, Rопис, S, G, self.main_window.L, Lоб, Lф, lm, R, self.main_window.N, O, kпр)
+        data['Rвпис'] = float(self.Rвпис.text())
+        data['Rопис'] = float(self.Rопис.text())
+        data['S'] = float(self.S.text())
+        data['G'] = float(self.G.text())
+        data['L'] = self.main_window.L
+        data['Lоб'] = int(self.Lо.text())
+        data['Lф'] = int(self.Lф.text())
+        data['lm'] = float(self.lm.text())
+        data['R'] = int(self.R.text())
+        data['O'] = int(self.O.text())
+        data['N'] = self.main_window.N
+        data['kпр'] = float(self.Kпр.text())
+
+        print(data)
+
+        Pобн, Pрасп = count_P(**data)
+
+        data['Pобн'] = Pобн
+        data['Pрасп'] = Pрасп
 
         self.Pобн_label.setText("Коэффициент обнаружения: " + str(round(Pобн, 4)))
         self.Pрасп_label.setText("Коэффициент расспознавания: " + str(round(Pрасп, 4)))
+
+        self.data = data
+
+    def save_result(self):
+        img_path = Path(self.main_window.image_files[self.main_window.current_image_index])
+        img_name = img_path.name
+        with open(os.path.join("results", img_name) + ".txt", mode="w", encoding="utf-8") as f:
+            res = '\n'.join(f"{str(key)}: {str(val)}" for key, val in self.data.items())
+            print(res)
+            f.write(res)
 
 
 class MenuBar(QMenu):
@@ -130,7 +155,7 @@ class MenuBar(QMenu):
         
         exit_action = QAction('Выход', self)
         exit_action.setShortcut('Ctrl+Q')
-        exit_action.triggered.connect(self.close)
+        exit_action.triggered.connect(self.main_window.close)
         self.addAction(exit_action)
 
     def openFolder(self):
@@ -195,16 +220,18 @@ class ToolBar(QToolBar):
     def prevImage(self):
         if self.main_window.current_image_index > 0:
             self.main_window.current_image_index -= 1
-            self.main_window.rotation_angle = 0
-            self.main_window.loadCurrentImage()
-            self.updateButtons()
+        else:
+            self.main_window.current_image_index = len(self.main_window.image_files) - 1
+        self.main_window.rotation_angle = 0
+        self.main_window.loadCurrentImage()
     
     def nextImage(self):
         if self.main_window.current_image_index < len(self.main_window.image_files) - 1:
             self.main_window.current_image_index += 1
-            self.main_window.acceptDropsrotation_angle = 0
-            self.main_window.loadCurrentImage()
-            self.updateButtons()
+        else:
+            self.main_window.current_image_index = 0
+        self.main_window.rotation_angle = 0
+        self.main_window.loadCurrentImage()
 
     def applyRotation(self):
         transform = QTransform().rotate(self.main_window.rotation_angle)
@@ -220,7 +247,7 @@ class ToolBar(QToolBar):
     
     def updateButtons(self):
         has_images = len(self.main_window.image_files) > 0
-        self.prev_button.setEnabled(has_images and self.main_window.current_image_index > 0)
-        self.next_button.setEnabled(has_images and self.main_window.current_image_index < len(self.main_window.image_files) - 1)
+        self.prev_button.setEnabled(has_images)
+        self.next_button.setEnabled(has_images)
         self.rotate_left_button.setEnabled(has_images)
         self.rotate_right_button.setEnabled(has_images)

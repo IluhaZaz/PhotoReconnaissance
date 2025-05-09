@@ -29,19 +29,18 @@ class DetectionProbabilityCounter(QMainWindow):
         self.N = None
     
     def loadCurrentImage(self):
-        if 0 <= self.current_image_index < len(self.image_files):
-            image_path = self.image_files[self.current_image_index]
-            self.original_pixmap = QPixmap(image_path)
-            
-            if not self.original_pixmap.isNull():
-                self.toolbar.applyRotation()
-                self.setWindowTitle(f'Фото: {os.path.basename(image_path)}')
+        image_path = self.image_files[self.current_image_index]
+        self.original_pixmap = QPixmap(image_path)
+        
+        if not self.original_pixmap.isNull():
+            self.toolbar.applyRotation()
+            self.setWindowTitle(f'Фото: {os.path.basename(image_path)}')
 
-                exif_data = get_exif_data(image_path)
-                resolution = (exif_data['ExifImageWidth'], exif_data['ExifImageHeight'])
-                self.input_panel.exif_label.setText(str(resolution))
-                self.L = max(resolution)
-                self.N = resolution[0]
+            exif_data = get_exif_data(image_path)
+            resolution = (exif_data['ExifImageWidth'], exif_data['ExifImageHeight'])
+            self.input_panel.exif_label.setText(str(resolution))
+            self.L = max(resolution)
+            self.N = resolution[0]
     
     def resizeEvent(self, event):
         if hasattr(self, 'original_pixmap') and self.original_pixmap:
@@ -54,15 +53,14 @@ class DPCinitUI:
     @staticmethod
     def initUI(main_window: DetectionProbabilityCounter):
         main_window.setCentralWidget(main_window.central_widget)
-        
-        layout = QHBoxLayout(main_window.central_widget)
-        
-        layout.addWidget(main_window.image_label)
 
         main_window.input_panel.setFixedSize(400, 900)
+        main_window.image_label.setFixedHeight(900)
         
+        layout = QHBoxLayout(main_window.central_widget)
+        layout.addWidget(main_window.image_label)
         layout.addWidget(main_window.input_panel)
-
+        
         menubar = main_window.menuBar()
         menubar.addMenu(MenuBar(main_window))
 

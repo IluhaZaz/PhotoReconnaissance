@@ -10,5 +10,5 @@ if __name__ == '__main__':
     main_window = DetectionProbabilityCounter()
     setupUI = DPCinitUI()
     setupUI.initUI(main_window)
-    main_window.show()
+    main_window.showMaximized()
     sys.exit(app.exec_())
