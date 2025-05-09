@@ -1,11 +1,11 @@
-from math import sqrt, exp, tan, pi
+from math import sqrt, exp, tan, pi, atan
 
 from PIL import Image
 from PIL.ExifTags import TAGS
 
 
-def count_P(Rвпис, Rопис, S, G, L, Lоб, Lф, lm, R, N, O, kпр):
-    O = 62*pi/180
+def count_P(Rвпис, Rопис, S, G, L, Lоб, Lф, lm, R, N, w, f, kпр):
+    O = 2*atan(w/(2*f))
 
     K = abs(Lоб-Lф)/Lф
     B = sqrt(G*(Rвпис + Rопис)/(2*S))

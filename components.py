@@ -71,10 +71,15 @@ class InputPanel(QWidget):
         self.R = QLineEdit()
         layout.addWidget(self.R)
 
-        self.O_label = QLabel("Угол захвата по горизонтали, град")
-        layout.addWidget(self.O_label)
-        self.O = QLineEdit()
-        layout.addWidget(self.O)
+        self.w_label = QLabel("Ширина матрицы, мм")
+        layout.addWidget(self.w_label)
+        self.w = QLineEdit()
+        layout.addWidget(self.w)
+
+        self.f_label = QLabel("Фокусное расстояние, мм")
+        layout.addWidget(self.f_label)
+        self.f = QLineEdit()
+        layout.addWidget(self.f)
 
         self.Kпр_label = QLabel("Коэффициент прогноза")
         layout.addWidget(self.Kпр_label)
@@ -115,7 +120,8 @@ class InputPanel(QWidget):
         self.Lф.clear()
         self.lm.clear()
         self.R.clear()
-        self.O.clear()
+        self.w.clear()
+        self.f.clear()
         self.Kпр.clear()
 
         self.Pобн_label.setText("Вероятность обнаружения")
@@ -130,7 +136,8 @@ class InputPanel(QWidget):
         self.Lф.setText(data['Lф'])
         self.lm.setText(data['lm'])
         self.R.setText(data['R'])
-        self.O.setText(data['O'])
+        self.w.setText(data['w'])
+        self.f.setText(data['f'])
         self.Kпр.setText(data['kпр'])
 
         self.count_results()
@@ -147,7 +154,8 @@ class InputPanel(QWidget):
         data['Lф'] = int(self.Lф.text())
         data['lm'] = float(self.lm.text())
         data['R'] = int(self.R.text())
-        data['O'] = int(self.O.text())
+        data['w'] = float(self.w.text())
+        data['f'] = float(self.f.text())
         data['N'] = self.main_window.N
         data['kпр'] = float(self.Kпр.text())
 
