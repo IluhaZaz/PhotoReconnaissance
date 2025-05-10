@@ -51,14 +51,16 @@ class InputPanel(QWidget):
         self.S = QLineEdit()
         layout.addWidget(self.S)
 
-        self.Lф_label = QLabel("Яркость фона")
+        self.Lф_label = QLabel("Цвет фона: ")
         layout.addWidget(self.Lф_label)
-        self.Lф = QLineEdit()
+        self.Lф = QPushButton("Выбрать цвет фона")
+        self.Lф.clicked.connect(self.pickColorF)
         layout.addWidget(self.Lф)
 
-        self.Lо_label = QLabel("Яркость объекта")
+        self.Lо_label = QLabel("Цвет объекта: ")
         layout.addWidget(self.Lо_label)
-        self.Lо = QLineEdit()
+        self.Lо = QPushButton("Выбрать цвет объекта")
+        self.Lо.clicked.connect(self.pickColorO)
         layout.addWidget(self.Lо)
 
         self.lm_label = QLabel("Максимальный линейный размер, м")
@@ -86,10 +88,6 @@ class InputPanel(QWidget):
         self.Kпр = QLineEdit()
         layout.addWidget(self.Kпр)
 
-        self.pick_color_btn = QPushButton("Посмотреть цвет")
-        self.pick_color_btn.clicked.connect(self.pickColor)
-        layout.addWidget(self.pick_color_btn)
-
         self.count_btn = QPushButton("Рассчитать коэффициенты", self)
         self.count_btn.clicked.connect(self.count_results)
         layout.addWidget(self.count_btn)
@@ -107,23 +105,33 @@ class InputPanel(QWidget):
         self.save_res_btn.clicked.connect(self.save_result)
         layout.addWidget(self.save_res_btn)
 
-    def pickColor(self):
+    def pickColorO(self):
         dialog = QColorDialog()
-        dialog.getColor(options=QColorDialog.ShowAlphaChannel)
+        color = dialog.getColor()
+        color = color.getRgb()
+        color = [str(c) for c in color]
+        self.Lо_label.setText("Цвет объекта: " + " ".join(color))
+
+    def pickColorF(self):
+        dialog = QColorDialog()
+        color = dialog.getColor()
+        color = color.getRgb()
+        color = [str(c) for c in color]
+        self.Lф_label.setText("Цвет фона: " + " ".join(color))
 
     def clear(self):
         self.Rвпис.clear()
         self.Rопис.clear()
         self.S.clear()
         self.G.clear()
-        self.Lо.clear()
-        self.Lф.clear()
         self.lm.clear()
         self.R.clear()
         self.w.clear()
         self.f.clear()
         self.Kпр.clear()
 
+        self.Lо_label.setText("Цвет объекта: ")
+        self.Lф_label.setText("Цвет фона: ")
         self.Pобн_label.setText("Вероятность обнаружения")
         self.Pрасп_label.setText("Вероятность распознавания")
 
@@ -132,26 +140,34 @@ class InputPanel(QWidget):
         self.Rопис.setText(data['Rопис'])
         self.S.setText(data['S'])
         self.G.setText(data['G'])
-        self.Lо.setText(data['Lоб'])
-        self.Lф.setText(data['Lф'])
+        self.Lо_label.setText("Цвет объекта: " + data['Lоб'])
+        self.Lф_label.setText("Цвет фона: " + data['Lф'])
         self.lm.setText(data['lm'])
         self.R.setText(data['R'])
         self.w.setText(data['w'])
         self.f.setText(data['f'])
         self.Kпр.setText(data['kпр'])
 
-        self.count_results()
+        self.Pобн_label.setText(f"Вероятность обнаружения: {data['Pобн']}")
+        self.Pрасп_label.setText(f"Вероятность распознавания: {data['Pрасп']}")
 
     def count_results(self):
         data = dict()
+
+        Lо = self.Lо_label.text().lstrip("Цвет объекта: ").split()
+        Lо = [int(c)/255 for c in Lо]
+
+        Lф = self.Lф_label.text().lstrip("Цвет фона: ").split()
+        Lф = [int(c)/255 for c in Lф]
+
+        data['Lоб'] = Lо
+        data['Lф'] = Lф
 
         data['Rвпис'] = float(self.Rвпис.text())
         data['Rопис'] = float(self.Rопис.text())
         data['S'] = float(self.S.text())
         data['G'] = float(self.G.text())
         data['L'] = self.main_window.L
-        data['Lоб'] = int(self.Lо.text())
-        data['Lф'] = int(self.Lф.text())
         data['lm'] = float(self.lm.text())
         data['R'] = int(self.R.text())
         data['w'] = float(self.w.text())

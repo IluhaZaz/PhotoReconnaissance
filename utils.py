@@ -5,9 +5,12 @@ from PIL.ExifTags import TAGS
 
 
 def count_P(Rвпис, Rопис, S, G, L, Lоб, Lф, lm, R, N, w, f, kпр):
+    Lоб = 0.2126*Lоб[0] + 0.7152*Lоб[1] + 0.0722*Lоб[2]
+    Lф = 0.2126*Lф[0] + 0.7152*Lф[1] + 0.0722*Lф[2]
+
     O = 2*atan(w/(2*f))
 
-    K = abs(Lоб-Lф)/Lф
+    K = abs(Lоб-Lф)/(Lф + Lоб)
     B = sqrt(G*(Rвпис + Rопис)/(2*S))
 
     lпикс = 360*N*tan(lm/(2*R))/(kпр*pi*O)
