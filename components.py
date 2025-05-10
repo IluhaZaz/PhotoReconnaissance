@@ -187,6 +187,9 @@ class InputPanel(QWidget):
 
         self.data = data
 
+        self.data["Lоб"] = self.Lо_label.text().lstrip("Цвет объекта: ")
+        self.data["Lф"] = self.Lф_label.text().lstrip("Цвет фона: ")
+
     def save_result(self):
         img_path = Path(self.main_window.image_files[self.main_window.current_image_index])
         img_name = img_path.name
