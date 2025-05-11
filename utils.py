@@ -13,7 +13,7 @@ def count_P(Rвпис, Rопис, S, G, L, Lоб, Lф, lm, R, N, w, f, kпр):
     K = abs(Lоб-Lф)/(Lф + Lоб)
     B = sqrt(G*(Rвпис + Rопис)/(2*S))
 
-    lпикс = 360*N*tan(lm/(2*R))/(kпр*pi*O)
+    lпикс = 360*N*atan(lm/(2*R))/(kпр*pi*O)
 
     try:
         Pобн = exp(-(B*L/(4*lпикс*sqrt(K)))**2)
