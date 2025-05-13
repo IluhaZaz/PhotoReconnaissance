@@ -1,4 +1,4 @@
-from math import sqrt, exp, tan, pi, atan
+from math import sqrt, exp, pi, atan
 
 from PIL import Image
 from PIL.ExifTags import TAGS

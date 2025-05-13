@@ -14,13 +14,17 @@ from PyQt5.QtWidgets import (
     QWidget, 
     QLineEdit, 
     QPushButton, 
-    QColorDialog
+    QColorDialog,
+    QTextEdit
     )
-from PyQt5.QtGui import QTransform
-from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QTransform, QRegExpValidator
+from PyQt5.QtCore import Qt, QRegExp
 
 from utils import count_P
 
+
+reg_ex = QRegExp("^-?[0-9]+([.][0-9]+)?$")
+float_validator = QRegExpValidator(reg_ex)
 
 class InputPanel(QWidget):
     def __init__(self, main_window: QMainWindow):
@@ -34,21 +38,25 @@ class InputPanel(QWidget):
         self.Rвпис_label = QLabel("Радиус вписанной окружности, м")
         layout.addWidget(self.Rвпис_label)
         self.Rвпис = QLineEdit()
+        self.Rвпис.setValidator(float_validator)
         layout.addWidget(self.Rвпис)
 
         self.Rопис_label = QLabel("Радиус описанной окружности, м")
         layout.addWidget(self.Rопис_label)
         self.Rопис = QLineEdit()
+        self.Rопис.setValidator(float_validator)
         layout.addWidget(self.Rопис)
 
         self.G_label = QLabel("Периметр объекта, м")
         layout.addWidget(self.G_label)
         self.G = QLineEdit()
+        self.G.setValidator(float_validator)
         layout.addWidget(self.G)
 
         self.S_label = QLabel("Площадь объекта, м^2")
         layout.addWidget(self.S_label)
         self.S = QLineEdit()
+        self.S.setValidator(float_validator)
         layout.addWidget(self.S)
 
         self.Lф_label = QLabel("Цвет фона: ")
@@ -66,26 +74,31 @@ class InputPanel(QWidget):
         self.lm_label = QLabel("Максимальный линейный размер, м")
         layout.addWidget(self.lm_label)
         self.lm = QLineEdit()
+        self.lm.setValidator(float_validator)
         layout.addWidget(self.lm)
 
         self.R_label = QLabel("Расстояние до объекта, м")
         layout.addWidget(self.R_label)
         self.R = QLineEdit()
+        self.R.setValidator(float_validator)
         layout.addWidget(self.R)
 
         self.w_label = QLabel("Ширина матрицы, мм")
         layout.addWidget(self.w_label)
         self.w = QLineEdit()
+        self.w.setValidator(float_validator)
         layout.addWidget(self.w)
 
         self.f_label = QLabel("Фокусное расстояние, мм")
         layout.addWidget(self.f_label)
         self.f = QLineEdit()
+        self.f.setValidator(float_validator)
         layout.addWidget(self.f)
 
         self.Kпр_label = QLabel("Коэффициент прогноза")
         layout.addWidget(self.Kпр_label)
         self.Kпр = QLineEdit()
+        self.Kпр.setValidator(float_validator)
         layout.addWidget(self.Kпр)
 
         self.count_btn = QPushButton("Рассчитать коэффициенты", self)
@@ -98,7 +111,7 @@ class InputPanel(QWidget):
         self.Pрасп_label = QLabel("Вероятность распознавания")
         layout.addWidget(self.Pрасп_label)
 
-        self.exif_label = QLabel()
+        self.exif_label = QTextEdit("", self.main_window)
         layout.addWidget(self.exif_label)
 
         self.save_res_btn = QPushButton("Сохранить результаты")
@@ -136,23 +149,27 @@ class InputPanel(QWidget):
         self.Pрасп_label.setText("Вероятность распознавания")
 
     def set_data(self, data: dict[str, str]):
-        self.Rвпис.setText(data['Rвпис'])
-        self.Rопис.setText(data['Rопис'])
-        self.S.setText(data['S'])
-        self.G.setText(data['G'])
-        self.Lо_label.setText("Цвет объекта: " + data['Lоб'])
-        self.Lф_label.setText("Цвет фона: " + data['Lф'])
-        self.lm.setText(data['lm'])
-        self.R.setText(data['R'])
-        self.w.setText(data['w'])
-        self.f.setText(data['f'])
-        self.Kпр.setText(data['kпр'])
+        self.Rвпис.setText(data.get('Rвпис', None))
+        self.Rопис.setText(data.get('Rопис', None))
+        self.S.setText(data.get('S', None))
+        self.G.setText(data.get('G', None))
+        self.Lо_label.setText("Цвет объекта: " + data.get('Lоб', None))
+        self.Lф_label.setText("Цвет фона: " + data.get('Lф', None))
+        self.lm.setText(data.get('lm', None))
+        self.R.setText(data.get('R', None))
+        self.w.setText(data.get('w', None))
+        self.f.setText(data.get('f', None))
+        self.Kпр.setText(data.get('kпр', None))
 
-        self.Pобн_label.setText(f"Вероятность обнаружения: {data['Pобн']}")
-        self.Pрасп_label.setText(f"Вероятность распознавания: {data['Pрасп']}")
+        self.Pобн_label.setText(f"Вероятность обнаружения: {data.get('Pобн', None)}")
+        self.Pрасп_label.setText(f"Вероятность распознавания: {data.get('Pрасп', None)}")
 
     def count_results(self):
         data = dict()
+
+        resolution = self.exif_label.toPlainText()
+        resolution = resolution[1:-1]
+        resolution = [int(r) for r in resolution.split(", ")]
 
         Lо = self.Lо_label.text().lstrip("Цвет объекта: ").split()
         Lо = [int(c)/255 for c in Lо]
@@ -163,17 +180,21 @@ class InputPanel(QWidget):
         data['Lоб'] = Lо
         data['Lф'] = Lф
 
-        data['Rвпис'] = float(self.Rвпис.text())
-        data['Rопис'] = float(self.Rопис.text())
-        data['S'] = float(self.S.text())
-        data['G'] = float(self.G.text())
-        data['L'] = self.main_window.L
-        data['lm'] = float(self.lm.text())
-        data['R'] = int(self.R.text())
-        data['w'] = float(self.w.text())
-        data['f'] = float(self.f.text())
-        data['N'] = self.main_window.N
-        data['kпр'] = float(self.Kпр.text())
+        try:
+            data['Rвпис'] = float(self.Rвпис.text())
+            data['Rопис'] = float(self.Rопис.text())
+            data['S'] = float(self.S.text())
+            data['G'] = float(self.G.text())
+            data['L'] = max(resolution)
+            data['lm'] = float(self.lm.text())
+            data['R'] = int(self.R.text())
+            data['w'] = float(self.w.text())
+            data['f'] = float(self.f.text())
+            data['N'] = resolution[0]
+            data['kпр'] = float(self.Kпр.text())
+        except:
+            print("Wrong input data")
+            return
 
         print(data)
 
@@ -231,6 +252,7 @@ class MenuBar(QMenu):
                 self.main_window.rotation_angle = 0
                 self.main_window.loadCurrentImage()
                 self.main_window.toolbar.updateButtons()
+
 
 class ToolBar(QToolBar):
     def __init__(self, parent: QMainWindow):

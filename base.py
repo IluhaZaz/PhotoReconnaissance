@@ -27,9 +27,6 @@ class DetectionProbabilityCounter(QMainWindow):
         self.current_image_index = 0
         self.rotation_angle = 0
 
-        self.L = None
-        self.N = None
-
     def load_results(self):
         img_path = Path(self.image_files[self.current_image_index])
         img_name = img_path.name
@@ -57,7 +54,10 @@ class DetectionProbabilityCounter(QMainWindow):
             self.setWindowTitle(f'Фото: {os.path.basename(image_path)}')
 
             exif_data = get_exif_data(image_path)
-            resolution = (exif_data['ExifImageWidth'], exif_data['ExifImageHeight'])
+            resolution = (
+                exif_data.get('ExifImageWidth', ''), 
+                exif_data.get('ExifImageHeight', '')
+            )
             self.input_panel.exif_label.setText(str(resolution))
             self.L = max(resolution)
             self.N = resolution[0]
