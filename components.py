@@ -83,6 +83,18 @@ class InputPanel(QWidget):
         self.R.setValidator(float_validator)
         layout.addWidget(self.R)
 
+        self.delta_d_label = QLabel("Максимальный размер отличающейся детали, м")
+        layout.addWidget(self.delta_d_label)
+        self.delta_d = QLineEdit()
+        self.delta_d.setValidator(float_validator)
+        layout.addWidget(self.delta_d)
+
+        self.beta_label = QLabel("коэффициент значимости отличий")
+        layout.addWidget(self.beta_label)
+        self.beta = QLineEdit()
+        self.beta.setValidator(float_validator)
+        layout.addWidget(self.beta)
+
         self.w_label = QLabel("Ширина матрицы, мм")
         layout.addWidget(self.w_label)
         self.w = QLineEdit()
@@ -110,6 +122,9 @@ class InputPanel(QWidget):
 
         self.Pрасп_label = QLabel("Вероятность распознавания")
         layout.addWidget(self.Pрасп_label)
+
+        self.Pрасп_кор_label = QLabel("Скорректированная вероятность распознавания")
+        layout.addWidget(self.Pрасп_кор_label)
 
         self.exif_label = QTextEdit("", self.main_window)
         layout.addWidget(self.exif_label)
@@ -139,6 +154,8 @@ class InputPanel(QWidget):
         self.G.clear()
         self.lm.clear()
         self.R.clear()
+        self.delta_d.clear()
+        self.beta.clear()
         self.w.clear()
         self.f.clear()
         self.Kпр.clear()
@@ -147,6 +164,7 @@ class InputPanel(QWidget):
         self.Lф_label.setText("Цвет фона: ")
         self.Pобн_label.setText("Вероятность обнаружения")
         self.Pрасп_label.setText("Вероятность распознавания")
+        self.Pрасп_кор_label.setText("Скорректированная вероятность распознавания")
 
     def set_data(self, data: dict[str, str]):
         self.Rвпис.setText(data.get('Rвпис', None))
@@ -157,12 +175,15 @@ class InputPanel(QWidget):
         self.Lф_label.setText("Цвет фона: " + data.get('Lф', None))
         self.lm.setText(data.get('lm', None))
         self.R.setText(data.get('R', None))
+        self.delta_d.setText(data.get('delta_d', None))
+        self.beta.setText(data.get('beta', None))
         self.w.setText(data.get('w', None))
         self.f.setText(data.get('f', None))
         self.Kпр.setText(data.get('kпр', None))
 
         self.Pобн_label.setText(f"Вероятность обнаружения: {data.get('Pобн', None)}")
         self.Pрасп_label.setText(f"Вероятность распознавания: {data.get('Pрасп', None)}")
+        self.Pрасп_кор_label.setText(f"Скорректированная вероятность распознавания: {data.get('Pрасп_кор', None)}")
 
     def count_results(self):
         data = dict()
@@ -188,6 +209,8 @@ class InputPanel(QWidget):
             data['L'] = max(resolution)
             data['lm'] = float(self.lm.text())
             data['R'] = int(self.R.text())
+            data['delta_d'] = float(self.delta_d.text())
+            data['beta'] = float(self.beta.text())
             data['w'] = float(self.w.text())
             data['f'] = float(self.f.text())
             data['N'] = resolution[0]
@@ -198,13 +221,15 @@ class InputPanel(QWidget):
 
         print(data)
 
-        Pобн, Pрасп = count_P(**data)
+        Pобн, Pрасп, Pрасп_кор = count_P(**data)
 
         data['Pобн'] = Pобн
         data['Pрасп'] = Pрасп
+        data['Pрасп_кор'] = Pрасп_кор
 
         self.Pобн_label.setText("Вероятность обнаружения: " + str(round(Pобн, 4)))
         self.Pрасп_label.setText("Вероятность расспознавания: " + str(round(Pрасп, 4)))
+        self.Pрасп_кор_label.setText("Скорректированная вероятность распознавания: " + str(round(Pрасп_кор, 4)))
 
         self.data = data
 

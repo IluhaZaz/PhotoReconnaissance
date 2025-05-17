@@ -4,7 +4,7 @@ from PIL import Image
 from PIL.ExifTags import TAGS
 
 
-def count_P(Rвпис, Rопис, S, G, L, Lоб, Lф, lm, R, N, w, f, kпр):
+def count_P(Rвпис, Rопис, S, G, L, Lоб, Lф, lm, R, delta_d, beta, N, w, f, kпр):
     Lоб = 0.2126*Lоб[0] + 0.7152*Lоб[1] + 0.0722*Lоб[2]
     Lф = 0.2126*Lф[0] + 0.7152*Lф[1] + 0.0722*Lф[2]
 
@@ -21,7 +21,9 @@ def count_P(Rвпис, Rопис, S, G, L, Lоб, Lф, lm, R, N, w, f, kпр):
     except ZeroDivisionError:
         Pобн, Pрасп = -1, -1
 
-    return Pобн, Pрасп
+    P_расп_кор = 1 - (1 - Pрасп)*exp(-beta * (delta_d / lm))
+
+    return Pобн, Pрасп, P_расп_кор
 
 
 def get_exif_data(image_path):

@@ -76,8 +76,8 @@ class DPCinitUI:
     def initUI(main_window: DetectionProbabilityCounter):
         main_window.setCentralWidget(main_window.central_widget)
 
-        main_window.input_panel.setFixedSize(400, 900)
-        main_window.image_label.setFixedHeight(900)
+        main_window.input_panel.setFixedSize(470, 910)
+        main_window.image_label.setFixedHeight(910)
         
         layout = QHBoxLayout(main_window.central_widget)
         layout.addWidget(main_window.image_label)
