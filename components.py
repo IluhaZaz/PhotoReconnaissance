@@ -34,6 +34,7 @@ class InputPanel(QWidget):
         self.data = {}
 
         layout = QVBoxLayout(self)
+        layout.setSpacing(2)
         
         self.Rвпис_label = QLabel("Радиус вписанной окружности, м")
         layout.addWidget(self.Rвпис_label)
@@ -59,13 +60,13 @@ class InputPanel(QWidget):
         self.S.setValidator(float_validator)
         layout.addWidget(self.S)
 
-        self.Lф_label = QLabel("Цвет фона: ")
+        self.Lф_label = QTextEdit("Цвет фона: ")
         layout.addWidget(self.Lф_label)
         self.Lф = QPushButton("Выбрать цвет фона")
         self.Lф.clicked.connect(self.pickColorF)
         layout.addWidget(self.Lф)
 
-        self.Lо_label = QLabel("Цвет объекта: ")
+        self.Lо_label = QTextEdit("Цвет объекта: ")
         layout.addWidget(self.Lо_label)
         self.Lо = QPushButton("Выбрать цвет объекта")
         self.Lо.clicked.connect(self.pickColorO)
@@ -192,10 +193,10 @@ class InputPanel(QWidget):
         resolution = resolution[1:-1]
         resolution = [int(r) for r in resolution.split(", ")]
 
-        Lо = self.Lо_label.text().lstrip("Цвет объекта: ").split()
+        Lо = self.Lо_label.toPlainText().lstrip("Цвет объекта: ").split()
         Lо = [int(c)/255 for c in Lо]
 
-        Lф = self.Lф_label.text().lstrip("Цвет фона: ").split()
+        Lф = self.Lф_label.toPlainText().lstrip("Цвет фона: ").split()
         Lф = [int(c)/255 for c in Lф]
 
         data['Lоб'] = Lо
@@ -233,8 +234,8 @@ class InputPanel(QWidget):
 
         self.data = data
 
-        self.data["Lоб"] = self.Lо_label.text().lstrip("Цвет объекта: ")
-        self.data["Lф"] = self.Lф_label.text().lstrip("Цвет фона: ")
+        self.data["Lоб"] = self.Lо_label.toPlainText().lstrip("Цвет объекта: ")
+        self.data["Lф"] = self.Lф_label.toPlainText().lstrip("Цвет фона: ")
 
     def save_result(self):
         img_path = Path(self.main_window.image_files[self.main_window.current_image_index])
@@ -262,7 +263,7 @@ class MenuBar(QMenu):
         self.addAction(exit_action)
 
     def openFolder(self):
-        folder_path = QFileDialog.getExistingDirectory(self, 'Выберите папку с фотками')
+        folder_path = QFileDialog.getExistingDirectory(self, 'Выберите папку с фотографиями')
         
         if folder_path:
             self.main_window.image_files = []

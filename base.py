@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import (
     QWidget
     )
 from PyQt5.QtGui import QPixmap
+from PIL import Image
 
 from utils import get_exif_data
 from components import InputPanel, MenuBar, ToolBar
@@ -26,6 +27,10 @@ class DetectionProbabilityCounter(QMainWindow):
         self.image_files = []
         self.current_image_index = 0
         self.rotation_angle = 0
+
+        
+        if not os.path.exists("results"):
+            os.makedirs("results")
 
     def load_results(self):
         img_path = Path(self.image_files[self.current_image_index])
@@ -54,10 +59,14 @@ class DetectionProbabilityCounter(QMainWindow):
             self.setWindowTitle(f'Фото: {os.path.basename(image_path)}')
 
             exif_data = get_exif_data(image_path)
-            resolution = (
-                exif_data.get('ExifImageWidth', ''), 
-                exif_data.get('ExifImageHeight', '')
-            )
+            if exif_data:
+                resolution = (
+                    exif_data.get('ExifImageWidth', ''), 
+                    exif_data.get('ExifImageHeight', '')
+                )
+            else:
+                with Image.open(image_path) as img:
+                    resolution = img.size
             self.input_panel.exif_label.setText(str(resolution))
             self.L = max(resolution)
             self.N = resolution[0]
@@ -76,8 +85,8 @@ class DPCinitUI:
     def initUI(main_window: DetectionProbabilityCounter):
         main_window.setCentralWidget(main_window.central_widget)
 
-        main_window.input_panel.setFixedSize(470, 910)
-        main_window.image_label.setFixedHeight(910)
+        main_window.input_panel.setFixedSize(470, 900)
+        main_window.image_label.setFixedHeight(900)
         
         layout = QHBoxLayout(main_window.central_widget)
         layout.addWidget(main_window.image_label)
@@ -87,6 +96,6 @@ class DPCinitUI:
         menubar.addMenu(MenuBar(main_window))
 
         main_window.addToolBar(main_window.toolbar)
-                
-        main_window.setWindowTitle('Просмотр фоток')
+
+        main_window.setWindowTitle('SpyInspector')
         main_window.setGeometry(0, 0, 1920, 1080)
